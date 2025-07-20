@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الذكاء الاصطناعي والابتكار</title>
+    <style>
+        /* CSS for Styling */
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-blue: #007bff;
+            --dark-blue: #002B4D;
+            --light-blue-bg: #f0f8ff;
+            --white-color: #ffffff;
+            --gray-color: #f4f4f4;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --gold-color: #ffd700;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light-blue-bg);
+            color: var(--dark-blue);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 800px;
+            background: var(--white-color);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 43, 77, 0.15);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .screen {
+            padding: 20px 40px 40px 40px;
+            display: none; /* All screens are hidden by default */
+        }
+
+        .screen.active {
+            display: block; /* Show the active screen */
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+            text-align: right;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .instructions li svg {
+            margin-left: 15px;
+            color: var(--primary-blue);
+        }
+
+        .input-group {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .input-group svg {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .input-group input {
+            width: calc(100% - 60px);
+            padding: 15px 50px 15px 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .btn {
+            background-color: var(--primary-blue);
+            color: var(--white-color);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-family: 'Tajawal', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quiz Interface */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--gray-color);
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .quiz-header div {
+            font-size: 0.9em;
+            text-align: right;
+        }
+        
+        .timer {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--dark-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .timer.warning { color: #ff9800; }
+        .timer.danger { color: var(--danger-color); }
+
+        #progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 8px;
+            background-color: var(--primary-blue);
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .question-body { padding: 20px; text-align: right; }
+        #question-text { font-size: 1.5em; font-weight: 500; line-height: 1.5; margin-bottom: 30px; }
+
+        .options button {
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            text-align: right; background: var(--white-color); border: 2px solid #ddd;
+            border-radius: 8px; cursor: pointer; font-size: 1.1em;
+            font-family: 'Tajawal', sans-serif; transition: all 0.2s;
+        }
+        
+        .options button:hover:not([disabled]) { border-color: var(--primary-blue); background-color: #e6f2ff; }
+        .options button.selected { border-color: var(--primary-blue); background-color: #d1e7fd; font-weight: 700; }
+        .options button.correct { border-color: var(--success-color); background-color: #d4edda; }
+        .options button.incorrect { border-color: var(--danger-color); background-color: #f8d7da; }
+        
+        .quiz-footer { padding: 20px; display: flex; justify-content: center; }
+
+        /* Results & Leaderboard Screen */
+        #results-screen h1, #leaderboard-screen h1 { font-size: 4em; margin: 10px 0; }
+        #results-screen .score-circle {
+            width: 150px; height: 150px; border-radius: 50%; background: var(--primary-blue);
+            color: var(--white-color); display: flex; justify-content: center; align-items: center;
+            margin: 20px auto; box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+        }
+        #saving-status { margin-top: 15px; font-style: italic; color: #555; }
+        .results-actions { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+
+        #leaderboard-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        #leaderboard-table th, #leaderboard-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        #leaderboard-table th {
+            background-color: var(--gray-color);
+            font-weight: 700;
+        }
+        #leaderboard-table tr:nth-child(even) { background-color: #f9f9f9; }
+        #leaderboard-table tr.current-user { background-color: #d1e7fd; font-weight: 700; }
+        #leaderboard-table .rank { font-size: 1.2em; font-weight: 700; }
+        #leaderboard-table .rank-1 { color: var(--gold-color); }
+        #leaderboard-table .rank-2 { color: #c0c0c0; }
+        #leaderboard-table .rank-3 { color: #cd7f32; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Screen 1: Instructions -->
+        <div id="instructions-screen" class="screen active">
+            <h2>اختبار برنامج الذكاء الاصطناعي ودعم الابتكار</h2>
+            <div class="instructions">
+                 <ul>
+                    <li><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>يتكون الاختبار من 10 أسئلة.</li>
+                    <li><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>مدة الاختبار هي 10 دقائق.</li>
+                    <li><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>اختر إجابة واحدة لكل سؤال.</li>
+                    <li><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M9 12H4a2 2 0 0 0-2 2v3c0 1.1.9 2 2 2h5"></path><path d="M15 12h5a2 2 0 0 1 2 2v3c0 1.1-.9 2-2 2h-5"></path></svg>ستظهر نتيجتك النهائية فور الانتهاء.</li>
+                </ul>
+            </div>
+            <button id="start-btn" class="btn">ابدأ الاختبار<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+        </div>
+
+        <!-- Screen 2: User Input -->
+        <div id="input-screen" class="screen">
+            <h2>قبل أن نبدأ...</h2>
+            <p>يرجى إدخال بياناتك للمتابعة.</p>
+            <div class="input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <input type="text" id="name-input" placeholder="الاسم الكامل" required>
+            </div>
+            <div class="input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                <input type="text" id="org-input" placeholder="الجهة / الشركة" required>
+            </div>
+            <button id="login-btn" class="btn" disabled>دخول</button>
+        </div>
+        
+        <!-- Screen 3: Quiz -->
+        <div id="quiz-screen" class="screen">
+             <div class="quiz-header">
+                <div id="user-info">
+                    <div id="display-name"></div><div id="display-org"></div>
+                </div>
+                <div id="question-counter" style="font-weight: 700;"></div>
+                <div class="timer" id="timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><path d="M12 12v6"></path><path d="M12 12H6"></path></svg>
+                    <span id="timer-text">10:00</span>
+                </div>
+            </div>
+            <div id="progress-bar-container"><div id="progress-bar"></div></div>
+            <div class="question-body">
+                <h3 id="question-text"></h3>
+                <div id="options-container" class="options"></div>
+            </div>
+            <div class="quiz-footer">
+                 <button id="next-q-btn" class="btn" disabled>التالي</button>
+            </div>
+        </div>
+        
+        <!-- Screen 4: Results -->
+        <div id="results-screen" class="screen">
+            <h2 id="results-title"></h2>
+            <p>لقد أكملت الاختبار بنجاح.</p>
+            <div class="score-circle"><h1 id="score"></h1></div>
+            <p>الوقت المستغرق: <span id="time-taken"></span></p>
+            <p id="saving-status">جاري حفظ نتيجتك...</p>
+            <div class="results-actions">
+                <button class="btn" onclick="location.reload()">إعادة الاختبار</button>
+                <button id="show-leaderboard-btn" class="btn" disabled>عرض المتصدرين</button>
+            </div>
+        </div>
+
+        <!-- Screen 5: Leaderboard -->
+        <div id="leaderboard-screen" class="screen">
+            <h2>المتصدرون 🏆</h2>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>الترتيب</th>
+                        <th>الاسم</th>
+                        <th>الجهة</th>
+                        <th>النتيجة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Leaderboard data will be inserted here -->
+                </tbody>
+            </table>
+            <div class="results-actions">
+                <button class="btn" onclick="location.reload()">إعادة الاختبار</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for Functionality
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMcYYnXTVW2vMROp-2b51oIIW0XgYC03gwSWLjRwzpMe6XXbOgqMLzAIGUPEsKtoPa/exec'; // <-- PASTE YOUR URL HERE
+
+        const quizData = [
+            {"question":"أي من التالي يُعد التعريف الأدق لمصطلح \"عملاء الذكاء الاصطناعي\" (AI Agents)؟","options":["برامج بسيطة تنفذ مهمة واحدة فقط عند تلقي الأوامر.","أنظمة برمجية مستقلة تعمل بشكل مستمر لتحقيق أهداف معقدة دون تدخل بشري مباشر في كل خطوة.","مجموعة من الخوارزميات المستخدمة لتدريب نماذج الذكاء الاصطناعي فقط.","تطبيقات تستخدم للدردشة والتفاعل مع المستخدمين مثل ChatGPT."],"answer":1},
+            {"question":"ما هو الهدف الرئيسي من \"الابتكار المؤسسي\" كما تم مناقشته في البرنامج؟","options":["تطبيق أي فكرة جديدة تطرأ على ذهن الموظفين بشكل فوري.","شراء أحدث التقنيات بغض النظر عن الحاجة الفعلية لها.","تحويل الأفكار الإبداعية إلى قيمة حقيقية ومستدامة تخدم الأهداف الاستراتيجية للمؤسسة.","زيادة عدد براءات الاختراع المسجلة باسم المؤسسة فقط."],"answer":2},
+            {"question":"يريد مدير قسم الموارد البشرية أتمتة عملية إرسال بريد ترحيبي للموظفين الجدد، وحجز مواعيد تعريفية لهم مع أقسام المؤسسة تلقائيًا. أي من الأدوات التالية هي الأنسب لتنفيذ هذا السيناريو المعقد؟","options":["Power BI","Make أو n8n","ChatGPT","Microsoft Excel"],"answer":1},
+            {"question":"ما هو الفرق الجوهري بين منصة مثل Zapier ومنصة مثل n8n عند بناء عمليات أتمتة؟","options":["Zapier يدعم تطبيقات أكثر من n8n.","n8n تسمح ببناء مسارات عمل أكثر تعقيدًا وتخصيصًا، ويمكن استضافتها ذاتيًا للتحكم الكامل في البيانات.","Zapier مخصص للشركات الكبيرة فقط، بينما n8n مخصص للأفراد.","لا يوجد فرق جوهري، كلاهما يؤدي نفس الوظيفة بنفس الطريقة."],"answer":1},
+            {"question":"عندما تقرر جهة حكومية استخدام الذكاء الاصطناعي لفرز طلبات التوظيف، ما هو الاعتبار الأخلاقي الأكثر أهمية الذي يجب تقييمه لضمان العدالة؟","options":["تكلفة تطوير النظام.","سرعة النظام في فرز الطلبات.","خطر التحيز (Bias) في الخوارزميات والذي قد يؤدي إلى استبعاد فئات معينة بشكل غير عادل.","سهولة استخدام واجهة النظام لموظفي الموارد البشرية."],"answer":2},
+            {"question":"إذا أرادت إدارة ما تصميم نظام جديد لتحفيز الموظفين على تقديم أفكار مبتكرة، فما هي الخطوة الأولى الأكثر فاعلية في عملية الابتكار المؤسسي؟","options":["البدء مباشرة في تنفيذ أول فكرة يتم اقتراحها.","تحديد مقاييس صارمة لتقييم الأفكار قبل جمعها.","شراء برنامج باهظ الثمن لإدارة الابتكار.","تأسيس قنوات وآليات واضحة لتوليد وجمع الأفكار من جميع الموظفين (Idea Generation)."],"answer":3},
+            {"question":"أي من الأدوات التالية تعتبر الأداة الأساسية لتصوير البيانات وإنشاء لوحات معلومات تفاعلية (Dashboards)؟","options":["n8n","Power BI","AI Canvas","Zapier"],"answer":1},
+            {"question":"ما هو الهدف الرئيسي من استخدام أداة \"AI Canvas\" أثناء التخطيط لمشروع يعتمد على الذكاء الاصطناعي؟","options":["كتابة الكود البرمجي للنموذج.","تصميم واجهة المستخدم النهائية للتطبيق.","تحديد وتوضيح المكونات الأساسية للمشروع مثل البيانات المطلوبة، التنبؤات، والقرارات التي سيتخذها النظام.","تسويق المنتج النهائي للمستخدمين."],"answer":2},
+            {"question":"موظف في قسم المالية يريد أتمتة مهمة بسيطة ومتكررة: كلما تمت إضافة صف جديد في ملف Google Sheets، يتم إرسال ملخصه في رسالة عبر Slack. أي أداة هي الأنسب لهذه المهمة الخطية والبسيطة؟","options":["Power BI","n8n","Zapier أو IFTTT","ChatGPT"],"answer":2},
+            {"question":"عند تحليل قدرات مؤسسة ما على تبني الذكاء الاصطناعي، ما الذي يهدف \"نموذج نضج الذكاء الاصطناعي\" (AI Maturity Model) إلى تقييمه؟","options":["عدد الموظفين في قسم تقنية المعلومات فقط.","مستوى وقدرة المؤسسة في رحلة تبنيها للذكاء الاصطناعي، من المراحل الأولية إلى التبني الاستراتيجي.","جودة البنية التحتية للشبكة والإنترنت.","الميزانية السنوية المخصصة للابتكار."],"answer":1}
+        ];
+
+        // DOM Elements
+        const instructionsScreen = document.getElementById('instructions-screen'), inputScreen = document.getElementById('input-screen'), quizScreen = document.getElementById('quiz-screen'), resultsScreen = document.getElementById('results-screen'), leaderboardScreen = document.getElementById('leaderboard-screen');
+        const startBtn = document.getElementById('start-btn'), loginBtn = document.getElementById('login-btn'), nextQBtn = document.getElementById('next-q-btn'), showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+        const nameInput = document.getElementById('name-input'), orgInput = document.getElementById('org-input');
+        const displayName = document.getElementById('display-name'), displayOrg = document.getElementById('display-org'), timerEl = document.getElementById('timer'), timerText = document.getElementById('timer-text');
+        const questionCounter = document.getElementById('question-counter'), questionText = document.getElementById('question-text'), optionsContainer = document.getElementById('options-container'), progressBar = document.getElementById('progress-bar');
+        const resultsTitle = document.getElementById('results-title'), scoreEl = document.getElementById('score'), timeTakenEl = document.getElementById('time-taken'), savingStatus = document.getElementById('saving-status');
+        const leaderboardTableBody = document.querySelector('#leaderboard-table tbody');
+
+        // State variables
+        let userName = '', userOrg = '', timerInterval, currentQuestionIndex = 0, score = 0, quizStartTime, userAnswers = new Array(quizData.length).fill("لم تتم الإجابة");
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        [nameInput, orgInput].forEach(input => {
+            input.addEventListener('input', () => {
+                loginBtn.disabled = !(nameInput.value.trim() !== '' && orgInput.value.trim() !== '');
+            });
+        });
+
+        startBtn.addEventListener('click', () => showScreen('input-screen'));
+
+        loginBtn.addEventListener('click', () => {
+            userName = nameInput.value.trim();
+            userOrg = orgInput.value.trim();
+            const welcomeModal = document.createElement('div');
+            welcomeModal.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 1000; text-align: center; font-size: 1.5em;`;
+            welcomeModal.innerHTML = `👋<br>أهلاً وسهلاً بك، <strong>${userName}</strong>!`;
+            document.body.appendChild(welcomeModal);
+            setTimeout(() => { welcomeModal.remove(); startQuiz(); }, 2000);
+        });
+
+        function startQuiz() {
+            displayName.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${userName}`;
+            displayOrg.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg> ${userOrg}`;
+            showScreen('quiz-screen');
+            quizStartTime = new Date();
+            startTimer();
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            nextQBtn.disabled = true;
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionCounter.textContent = `السؤال ${currentQuestionIndex + 1} / ${quizData.length}`;
+            questionText.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option');
+                button.dataset.index = index;
+                button.addEventListener('click', handleOptionClick);
+                optionsContainer.appendChild(button);
+            });
+            progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
+        }
+
+        function handleOptionClick(event) {
+            const selectedButton = event.target;
+            const selectedAnswerIndex = parseInt(selectedButton.dataset.index);
+            const correctAnswerIndex = quizData[currentQuestionIndex].answer;
+            document.querySelectorAll('.option').forEach(btn => btn.disabled = true);
+            if (selectedAnswerIndex === correctAnswerIndex) {
+                selectedButton.classList.add('correct');
+                score++;
+                userAnswers[currentQuestionIndex] = 'صحيحة';
+            } else {
+                selectedButton.classList.add('incorrect');
+                document.querySelector(`.option[data-index='${correctAnswerIndex}']`).classList.add('correct');
+                userAnswers[currentQuestionIndex] = 'خاطئة';
+            }
+            nextQBtn.disabled = false;
+        }
+
+        nextQBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) displayQuestion();
+            else endQuiz();
+        });
+
+        function startTimer() {
+            let time = 10 * 60;
+            timerInterval = setInterval(() => {
+                let minutes = Math.floor(time / 60), seconds = time % 60;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerText.textContent = `${minutes}:${seconds}`;
+                if (time < 60) timerEl.classList.add('danger');
+                else if (time < 120) timerEl.classList.add('warning');
+                if (--time < 0) endQuiz(true);
+            }, 1000);
+        }
+
+        function endQuiz(timedOut = false) {
+            clearInterval(timerInterval);
+            if (timedOut) alert("انتهى الوقت!");
+            const quizEndTime = new Date();
+            const elapsedSeconds = Math.floor((quizEndTime - quizStartTime) / 1000);
+            const minutes = Math.floor(elapsedSeconds / 60), seconds = elapsedSeconds % 60;
+            timeTakenEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} دقائق`;
+            resultsTitle.textContent = `تهانينا، ${userName}!`;
+            scoreEl.textContent = `${score} / ${quizData.length}`;
+            progressBar.style.width = '100%';
+            showScreen('results-screen');
+            saveResultsToSheet();
+        }
+
+        function saveResultsToSheet() {
+            if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                savingStatus.textContent = 'لم يتم تكوين رابط الحفظ.';
+                savingStatus.style.color = 'red';
+                showLeaderboardBtn.disabled = false;
+                return;
+            }
+            const dataToSubmit = {'التاريخ والوقت': new Date().toLocaleString('ar-OM'), 'الاسم الكامل': userName, 'الجهة': userOrg, 'الدرجة النهائية': `${score} / ${quizData.length}`};
+            userAnswers.forEach((answer, index) => { dataToSubmit[`س${index + 1}`] = answer; });
+            fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(dataToSubmit), headers: {'Content-Type': 'text/plain;charset=utf-8'}})
+            .then(() => {
+                savingStatus.textContent = 'تم حفظ نتيجتك بنجاح!';
+                savingStatus.style.color = 'green';
+                showLeaderboardBtn.disabled = false;
+            }).catch(err => {
+                console.error('Error:', err);
+                savingStatus.textContent = 'حدث خطأ أثناء حفظ النتيجة.';
+                savingStatus.style.color = 'red';
+                showLeaderboardBtn.disabled = false;
+            });
+        }
+
+        showLeaderboardBtn.addEventListener('click', () => {
+            showScreen('leaderboard-screen');
+            leaderboardTableBody.innerHTML = '<tr><td colspan="4">جاري تحميل المتصدرين...</td></tr>';
+            
+            // FIX: Check if the SCRIPT_URL is the placeholder before fetching
+            if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                leaderboardTableBody.innerHTML = '<tr><td colspan="4" style="color: red;">لم يتم تكوين رابط جلب البيانات. يرجى مراجعة التعليمات.</td></tr>';
+                return;
+            }
+
+            fetch(SCRIPT_URL).then(res => res.json()).then(data => {
+                leaderboardTableBody.innerHTML = '';
+                if (data.result === 'success' && data.data.length > 0) {
+                    data.data.forEach((row, index) => {
+                        const tr = document.createElement('tr');
+                        if (row.name === userName) tr.classList.add('current-user');
+                        const rank = index + 1;
+                        tr.innerHTML = `
+                            <td><span class="rank rank-${rank}">${rank}</span></td>
+                            <td>${row.name}</td>
+                            <td>${row.org}</td>
+                            <td>${row.score}</td>
+                        `;
+                        leaderboardTableBody.appendChild(tr);
+                    });
+                } else {
+                    leaderboardTableBody.innerHTML = '<tr><td colspan="4">لا توجد بيانات لعرضها حاليًا.</td></tr>';
+                }
+            }).catch(err => {
+                console.error('Error fetching leaderboard:', err);
+                leaderboardTableBody.innerHTML = '<tr><td colspan="4">حدث خطأ أثناء تحميل البيانات.</td></tr>';
+            });
+        });
+
+    </script>
+</body>
+</html>
